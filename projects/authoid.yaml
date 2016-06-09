@@ -1,0 +1,36 @@
+paths:
+  /{api:v1}:
+    x-modules:
+        # swagger options, overriding the shared ones from the merged specs (?)
+      - spec:
+          info:
+            version: 1.0.0-beta
+            title: Wikimedia auth service (prototype)
+            description: >
+              Basic session storage & auth service prototype.
+
+            termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
+            contact:
+              name: the Wikimedia Services team
+              url: http://mediawiki.org/wiki/RESTBase
+            license:
+              name: Apache2
+              url: http://www.apache.org/licenses/LICENSE-2.0
+
+          paths:
+            /sessions:
+              x-modules:
+                - path: v1/sessions.js
+                  options: '{{options.sessions}}'
+        options: '{{options}}'
+
+  /{api:sys}:
+    x-modules:
+      - spec:
+          paths:
+            /table:
+              x-modules:
+                - path: sys/table.js
+                  options:
+                    conf: '{{options.table}}'
+        options: '{{options}}'

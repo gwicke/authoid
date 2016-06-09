@@ -1,0 +1,82 @@
+# RESTBase wikimedia example config
+
+# Load some project templates. These are referenced / shared between domains
+# in the root_spec further down.
+authoid: &authoid
+  x-modules:
+    - path: projects/authoid.yaml
+      options: &default_options
+        table:
+          backend: cassandra
+          hosts: [localhost]
+          keyspace: system
+          username: cassandra
+          password: cassandra
+          defaultConsistency: one # or 'localQuorum' for production
+          storage_groups:
+            - name: default.group.local
+              domains: /./
+
+
+# The root of the spec tree. Domains tend to share specs by referencing them
+# using YAML references.
+spec_root: &spec_root
+  title: "The RESTBase root"
+  x-sub-request-filters:
+    - type: default
+      name: http
+      options:
+        allow:
+          - pattern: /^https?:\/\/[a-zA-Z0-9\.]+\/w\/api\.php/
+            forward_headers: true
+          - pattern: /^https?:\/\/parsoid-beta.wmflabs.org.+/
+            forward_headers: true
+          - pattern: /^https?:\/\//
+  paths:
+    # global domain
+    /{domain:wikimedia.org}: *authoid
+
+    # A robots.txt to make sure that the content isn't indexed.
+    /robots.txt:
+      get:
+        x-request-handler:
+          - static:
+              return:
+                status: 200
+                headers:
+                  content-type: text/plain
+                body: |
+                  User-agent: *
+                  Allow: /*/v1/?doc
+                  Disallow: /
+
+# Finally, a standard service-runner config.
+services:
+  - name: authoid
+    module: hyperswitch
+    conf: 
+      port: 7231
+      spec: *spec_root
+      salt: secret
+      default_page_size: 125
+      user_agent: RESTBase
+
+logging:
+  level: info
+  #streams:
+  #- type: gelf
+  #  host: <%= @logstash_host %>
+  #  port: <%= @logstash_port %>
+
+metrics:
+  type: statsd
+  host: localhost
+  port: 8125
+  batch: true
+
+ratelimiter:
+  type: kademlia
+  # Cluster nodes
+  seeds:
+    # Port 3050 used by default
+    - 127.0.0.1

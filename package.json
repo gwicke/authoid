@@ -1,0 +1,53 @@
+{
+  "name": "authoid",
+  "version": "0.1.0",
+  "description": "Auth & session storage service prototype",
+  "main": "lib/server.js",
+  "scripts": {
+    "start": "service-runner",
+    "test": "sh test/utils/run_tests.sh test",
+    "coverage": "sh test/utils/run_tests.sh coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gwicke/authoid.git"
+  },
+  "keywords": [
+    "REST",
+    "authentication",
+    "session",
+    "cassandra",
+    "restbase"
+  ],
+  "author": "Wikimedia Service Team <services@wikimedia.org>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://phabricator.wikimedia.org/tag/authoid/"
+  },
+  "homepage": "https://github.com/gwicke/authoid",
+	"readme": "README.md",
+  "dependencies": {
+    "bluebird": "^3.4.0",
+    "cassandra-uuid": "^0.0.2",
+    "restbase-mod-table-cassandra": "^0.9.1",
+    "service-runner": "^2.0.0",
+    "hyperswitch": "^0.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5",
+    "mocha-jscs": "^5.0.0",
+    "jscs": "^3.0.3",
+    "mocha-jshint": "^2.3.1",
+    "mocha-lcov-reporter": "^1.2.0",
+    "restbase-mod-table-sqlite": "^0.1.17",
+    "swagger-test": "0.3.0"
+  },
+  "deploy": {
+    "node": "4.3.0",
+    "target": "debian",
+    "dependencies": {
+      "_all": []
+    }
+  }
+}
