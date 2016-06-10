@@ -1,7 +1,9 @@
 "use strict";
-var HyperSwitch = require('hyperswitch');
-var HTTPError = HyperSwitch.HTTPError;
-var URI = HyperSwitch.URI;
+const HyperSwitch = require('hyperswitch');
+const HTTPError = HyperSwitch.HTTPError;
+const URI = HyperSwitch.URI;
+const TimeUuid = require('cassandra-uuid').TimeUuid;
+const fixedTid = '11111111-1111-1111-1111-111111111111';
 
 var sessionTable = {
     name: 'auth_sessions',
@@ -12,11 +14,15 @@ var sessionTable = {
         version: 1,
         attributes: {
             key: 'string',
+            // Work-around: Use a fixed, explicit tid to disable implicit
+            // revisioning in current restbase backend.
+            tid: 'timeuuid',
             value: 'blob',
             deleted: 'boolean',
         },
         index: [
             { attribute: 'key', type: 'hash' },
+            { attribute: 'tid', type: 'range', order: 'desc' },
         ],
         revisionRetentionPolicy: {
             type: 'ttl',
@@ -33,6 +39,7 @@ function put(hyper, req) {
             table: sessionTable.name,
             attributes: {
                 key: req.params.key,
+                tid: fixedTid,
                 value: req.body,
                 deleted: false,
             }
@@ -47,7 +54,9 @@ function get(hyper, req) {
             table: sessionTable.name,
             attributes: {
                 key: req.params.key,
+                tid: fixedTid,
             },
+            proj: ['value', 'deleted'],
             limit: 1,
         }
     })
