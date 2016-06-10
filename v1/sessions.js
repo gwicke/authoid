@@ -2,7 +2,6 @@
 const HyperSwitch = require('hyperswitch');
 const HTTPError = HyperSwitch.HTTPError;
 const URI = HyperSwitch.URI;
-const TimeUuid = require('cassandra-uuid').TimeUuid;
 const fixedTid = '11111111-1111-1111-1111-111111111111';
 
 var sessionTable = {
