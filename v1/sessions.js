@@ -99,10 +99,11 @@ module.exports = function(options) {
     return {
         spec: {
             paths: {
-                '/{key}': {
+                '/session/{key}': {
                     'get': {
                         operationId: 'get',
-                        produces: 'application/binary',
+                        produces: [ 'application/binary' ],
+                        tags: [ 'Sessions' ],
                         parameters: [
                         {
                             name: 'key',
@@ -114,7 +115,8 @@ module.exports = function(options) {
                     },
                     'put': {
                         operationId: 'put',
-                        consumes: 'application/binary',
+                        consumes: [ 'application/binary' ],
+                        tags: [ 'Sessions' ],
                         parameters: [
                         {
                             name: 'key',
@@ -132,6 +134,7 @@ module.exports = function(options) {
                     },
                     'delete': {
                         operationId: 'del',
+                        tags: [ 'Sessions' ],
                         parameters: [
                         {
                             name: 'key',

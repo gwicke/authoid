@@ -18,8 +18,10 @@ paths:
               url: http://www.apache.org/licenses/LICENSE-2.0
 
           paths:
-            /sessions:
+            /user:
               x-modules:
+                - path: v1/auth.yaml
+                  options: '{{options.auth}}'
                 - path: v1/sessions.js
                   options: '{{options.sessions}}'
         options: '{{options}}'
