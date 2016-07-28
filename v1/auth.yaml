@@ -49,10 +49,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      x-request-handler:
-        - backend_request:
-            return:
-              status: 200
+      operationId: verifyPassword
       x-monitor: false
 
   /password/reset/{userid}:
@@ -85,10 +82,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      x-request-handler:
-        - backend_request:
-            return:
-              status: 201
+      operationId: createPassword
       x-monitor: false
 
   /password/{userid}:
@@ -143,10 +137,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      x-request-handler:
-        - backend_request:
-            return:
-              status: 201
+      operationId: resetPassword
       x-monitor: false
 
   /2fa_token/verify/{userid}:
@@ -187,12 +178,9 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      x-request-handler:
-        - backend_request:
-            return:
-              status: 201
+      operationId: verifyToken
       x-monitor: false
-      
+
   /2fa_token/{userid}:
     # Set up two factor authentication and generate new tokens
     post:
@@ -224,10 +212,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      x-request-handler:
-        - backend_request:
-            return:
-              status: 201
+      operationId: createToken
       x-monitor: false
 
 definitions:
