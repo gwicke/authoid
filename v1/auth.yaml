@@ -82,7 +82,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      operationId: createPassword
+      operationId: resetPassword
       x-monitor: false
 
   /password/{userid}:
@@ -137,7 +137,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/problem'
-      operationId: resetPassword
+      operationId: createPassword
       x-monitor: false
 
   /2fa_token/verify/{userid}:
