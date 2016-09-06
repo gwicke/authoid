@@ -1,0 +1,262 @@
+info:
+  version: '1.0.0-beta'
+  title: MediaWiki Authentication API
+  description: Authontication service API
+  termsofservice: https://github.com/wikimedia/authoid
+  contact:
+    name: Services
+    email: services@lists.wikimedia.org
+    url: https://www.mediawiki.org/wiki/Services
+  license:
+    name: Apache licence, v2
+    url: https://www.apache.org/licenses/LICENSE-2.0
+paths:
+  /password/verify/{userid}:
+    # Check password
+    post:
+      tags:
+        - Authentication
+      summary: Verify password
+      description: |
+        Check password for user id.
+
+        Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
+      consumes:
+        - multipart/form-data
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: The ID of the user
+          type: string
+          required: true
+        - name: password
+          in: formData
+          description: Plain text password
+          type: string
+          format: password
+          required: true
+      responses:
+        '200':
+          description: Password is valid
+        '403':
+          description: Password is invalid
+          schema:
+            $ref: '#/definitions/invalid_password'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      operationId: verifyPassword
+      x-monitor: false
+
+  /password/reset/{userid}:
+    # Set password
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: |
+        Request to reset the password and get a reset token
+
+        Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
+      consumes:
+        - multipart/form-data
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: The ID of the user
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Reset operation was successfull
+          schema:
+            $ref: '#/definitions/reset_token'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      operationId: resetPassword
+      x-monitor: false
+
+  /password/{userid}:
+    # Set password
+    post:
+      tags:
+        - Authentication
+      summary: Set new password
+      description: |
+        Set a new password for the user id. Verify the rights to reset password either using
+        an old user password, or using a password reset token received from the `/password/reset`
+        endpoint. In case there's no user with this ID a new record will be created and verification
+        is not needed.
+
+        Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
+      consumes:
+        - multipart/form-data
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: The ID of the user
+          type: string
+          required: true
+        - name: old_password
+          in: formData
+          description: Plain text old password
+          type: string
+          format: password
+          required: false
+        - name: token
+          in: formData
+          description: Password reset token
+          type: string
+          format: string
+          required: false
+        - name: new_password
+          in: formData
+          description: Plain text new password
+          type: string
+          format: password
+          required: true
+      responses:
+        '201':
+          description: New password was set
+        '403':
+          description: Password is invalid
+          schema:
+            $ref: '#/definitions/invalid_password'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      operationId: createPassword
+      x-monitor: false
+
+  /2fa_token/verify/{userid}:
+    # Verify two factor authentication token
+    post:
+      tags:
+        - Authentication
+        - Two-factor
+      summary: Verify two-factor auth token
+      description: |
+        Checks if the two-factor token is valid.
+
+        Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
+      consumes:
+        - multipart/form-data
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: The ID of the user
+          type: string
+          required: true
+        - name: token
+          in: formData
+          description: The scratch token for the two-factor authentication
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Token is valid
+        '403':
+          description: Token is invalid
+          schema:
+            $ref: '#/definitions/invalid_password'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      operationId: verifyToken
+      x-monitor: false
+
+  /2fa_token/{userid}:
+    # Set up two factor authentication and generate new tokens
+    post:
+      tags:
+        - Authentication
+        - Two-factor
+      summary: Generate two-factor auth tokens
+      description: |
+        Creates a new set of scratch tokens for the user.
+
+        Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
+      consumes:
+        - multipart/form-data
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: The ID of the user
+          type: string
+          required: true
+      responses:
+        '201':
+          description: New set of scratch tokens created
+          schema:
+            $ref: '#/definitions/2fa_token'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      operationId: createToken
+      x-monitor: false
+
+definitions:
+  # A https://tools.ietf.org/html/draft-nottingham-http-problem
+  problem:
+    required:
+      - type
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      detail:
+        type: string
+      instance:
+        type: string
+  invalid_password:
+    required:
+      - type
+      - reason
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      detail:
+        type: string
+      reason:
+        enum: [ 'PASSWORD_INVALID', 'USER_NOT_FOUND' ]
+  reset_token:
+    required:
+      - token
+    properties:
+      token:
+        type: string
+  2fa_token:
+    required:
+      - scratch_tokens
+      - key
+    properties:
+      scratch_tokens:
+        type: array
+        items:
+          type: string
+      key:
+        type: string
