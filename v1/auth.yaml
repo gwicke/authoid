@@ -94,7 +94,8 @@ paths:
       description: |
         Set a new password for the user id. Verify the rights to reset password either using
         an old user password, or using a password reset token received from the `/password/reset`
-        endpoint.
+        endpoint. In case there's no user with this ID a new record will be created and verification
+        is not needed.
 
         Stability: [experimental](https://www.mediawiki.org/wiki/API_versioning#Experimental)
       consumes:
